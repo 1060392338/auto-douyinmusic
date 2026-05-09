@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+.venv/
+venv/
+
+# Secrets
+.env
+
+# Browser data (Chrome sessions, cookies)
+data/
+chrome_data/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+*/.DS_Store
+
+# Debug / temp files
+debug_*.py
+temp_*.png
+qr_*.png
+
+# Old iteration scripts (production version is export_v5.py)
+export.py
+export_batch.py
+export_one.py
+export_v2.py
+export_v3.py
+export_v4.py
+mini_export.py
+step1.py

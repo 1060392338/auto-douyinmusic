@@ -1,0 +1,30 @@
+global:
+  browser:
+    chrome_port: 9223
+    user_data_dir: "data/douyin_music/default/chrome_data"
+  llm:
+    provider: deepseek
+    model: deepseek-chat
+    temperature: 0.8
+  llm_main_agent:
+    provider: deepseek
+    model: deepseek-v4-pro
+    temperature: 0.7
+
+tenants:
+  - id: douyin_music_default
+    enabled: true
+    platform: "抖音音乐"
+    account: "默认账号"
+    display_name: "抖音音乐号"
+    platform_config:
+      publisher: douyin_music
+      studio_url: "https://music.douyin.com/studio"
+      chrome_data: "chrome_data"
+      phone: ""
+      password: ""
+    creation_config:
+      default_style: "民谣风格，木吉他为主，节奏舒缓，情感细腻"
+      default_theme: "关于爱情遗憾的歌词，风格偏向伤感"
+      export_mode: "轨道合并"
+      export_sub_style: ""
