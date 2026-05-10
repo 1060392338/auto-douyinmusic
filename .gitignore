@@ -37,3 +37,9 @@ export_v3.py
 export_v4.py
 mini_export.py
 step1.py
+
+# Temp scripts (今天调试)
+check_assets2.py
+check_assets3.py
+export_batch.sh
+export_batch2.py

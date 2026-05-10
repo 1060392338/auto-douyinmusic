@@ -21,28 +21,55 @@ def js(code, d=None):
             time.sleep(1)
     return d
 
+# 先处理任何残留弹窗 - 多重处理
+for _ in range(3):
+    try:
+        P.handle_alert(accept=True)
+        print("✅ 清除弹窗", flush=True)
+        time.sleep(0.5)
+    except:
+        break
+time.sleep(1)
+
+# 用JS导航避免beforeunload弹窗阻塞
+P.run_js("window.onbeforeunload=null;window.location.href='https://music.douyin.com/studio/create'")
+time.sleep(5)
+
 song = sys.argv[1] if len(sys.argv) > 1 else "迷音"
 print(f"=== 导出 {song} ===", flush=True)
 
-# 1. 作曲页 -> 点素材
-P.get("https://music.douyin.com/studio/create"); time.sleep(4)
-P.ele(f'xpath://div[contains(@class,"libraryItemWrapper") and contains(.,"{song}")]', timeout=8).click()
+# 1. 作曲页 -> 点素材（用JS dispatchEvent，DrissionPage .click()有时不触发SPA）
+# 确认在创作页
+if 'create' not in P.url:
+    P.run_js("window.onbeforeunload=null;window.location.href='https://music.douyin.com/studio/create'")
+    time.sleep(5)
+# 等页面加载
+time.sleep(2)
+js(f"""(function(){{var items=document.querySelectorAll('[class*=\"titleRow\"]');for(var i=0;i<items.length;i++){{if(items[i].textContent.includes(\"{song}\")){{['pointerdown','pointerup','mousedown','mouseup','click'].forEach(function(t){{items[i].dispatchEvent(new PointerEvent(t,{{bubbles:true,cancelable:true}}))}});return 'clicked'}}}}return'not found'}})()""")
 time.sleep(3)
 print("1. 素材✅", flush=True)
 
 # 2. AI编辑 (button class: aiEditButton)
-js("""document.querySelectorAll('button[class*="aiEditButton"]').forEach(b=>{b.dispatchEvent(new MouseEvent('click',{bubbles:!0,cancelable:!0}))})""")
-time.sleep(2)
+js("""document.querySelectorAll('button[class*="aiEditButton"]').forEach(b=>{b.dispatchEvent(new MouseEvent('click',{bubbles:!0,cancelable:!0,view:window,button:0}))})""")
+time.sleep(3)
 print("2. AI编辑✅", flush=True)
 
-# 3. 去AI编辑器 (button class: primaryBtn)
-js("""document.querySelectorAll('button[class*="primaryBtn"]').forEach(b=>{b.dispatchEvent(new MouseEvent('click',{bubbles:!0,cancelable:!0}))})""")
-time.sleep(8)
+# 3. 去AI编辑器 (button class: primaryBtn) - 先滚到可见再点击
+print("3. 去AI编辑器...", flush=True)
+js("""document.querySelector('button[class*="primaryBtn"]')?.scrollIntoView({behavior:"instant",block:"center"})""")
+time.sleep(1)
+for _click_attempt in range(3):
+    js("""document.querySelectorAll('button[class*="primaryBtn"]').forEach(b=>{b.focus();['pointerdown','pointerup','mousedown','mouseup','click'].forEach(t=>{b.dispatchEvent(new PointerEvent(t,{bubbles:!0,cancelable:!0}))})})""")
+    time.sleep(6)
+    if 'playground' in P.url:
+        break
+    print(f"  重试... ({P.url[:50]})", flush=True)
 js("window.onbeforeunload=null;window.alert=function(){}")
-print(f"3. 编辑器 {P.url[:60]}✅", flush=True)
+print(f"  编辑器 {P.url[:60]}✅", flush=True)
 
-# 4. 等歌曲加载完成
-time.sleep(5)
+# 4. 等歌曲加载完成（关键：导出按钮需要加载完成才会激活）
+print("4. 等待编辑器完全加载...", flush=True)
+time.sleep(10)
 
 # 5. 点击导出 (semi-button-secondary, 文本=导出)
 print("4. 导出...", flush=True)
@@ -81,7 +108,9 @@ if has:
 
 # 9. 资产页验证
 time.sleep(3)
-P.get("https://music.douyin.com/studio/assets"); time.sleep(5)
+# 用JS导航到资产页（避免beforeunload弹窗）
+P.run_js("window.onbeforeunload=null;window.location.href='https://music.douyin.com/studio/assets';")
+time.sleep(5)
 ok = js(f"return document.body.textContent.includes('{song}')", False)
 print(f"结果: {'✅' if ok else '❌'} {song}", flush=True)
 if not ok:
