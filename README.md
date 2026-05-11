@@ -1,6 +1,6 @@
 # 🎵 抖音音乐开放平台 · AI 自动化工作流
 
-> 从 AI 作词 → AI 作曲 → 编辑器导出 → 发布全曲，全流程自动化。
+> 从 AI 作词 → AI 作曲 → 编辑器导出。**发布全曲由用户人工操作。**
 > 基于 **5-Agent 架构**（DeepSeek 双模型）+ **浏览器自动化**（DrissionPage）。
 
 ---
@@ -28,15 +28,15 @@
 │                MusicCreationPipeline              │
 ├─────────────────────────────────────────────────┤
 │              OrchestratorAgent (V4 Pro)           │
-│  ┌──────────┐ ┌──────────┐ ┌────────┐ ┌──────┐ │
-│  │Collector │ │Creative  │ │Song-   │ │Pub-  │ │
-│  │&Analyst  │ │Director  │ │writer  │ │lisher│ │
-│  │(chat)    │ │(chat)    │ │(chat)  │ │(chat)│ │
-│  └──────────┘ └──────────┘ └────────┘ └──────┘ │
+│  ┌──────────┐ ┌──────────┐ ┌────────┐          │
+│  │Collector │ │Creative  │ │Song-   │          │
+│  │&Analyst  │ │Director  │ │writer  │          │
+│  │(chat)    │ │(chat)    │ │(chat)  │          │
+│  └──────────┘ └──────────┘ └────────┘          │
 ├─────────────────────────────────────────────────┤
 │         BrowserCore / DrissionPage (9223)         │
 │     ┌──────────────┐  ┌──────────────────┐       │
-│     │  Chrome 无头  │  │  抖音音乐开放平台  │       │
+│     │  Chrome 隐藏  │  │  抖音音乐开放平台  │       │
 │     └──────────────┘  └──────────────────┘       │
 └─────────────────────────────────────────────────┘
 ```
@@ -47,7 +47,6 @@
 | **CollectorAnalystAgent** | `deepseek-chat` | 热搜分析，识别热门风格方向 |
 | **CreativeDirectorAgent** | `deepseek-chat` | 创意总监，生成歌曲蓝图 |
 | **SongwriterAgent** | `deepseek-chat` | 词曲创作，生成歌词与作曲提示 |
-| **PublisherAgent** | `deepseek-chat` | 发布全曲，管理发行签约 |
 
 ---
 
@@ -57,27 +56,29 @@
 |------|------|------|
 | ✅ AI 作词 | 已完成 | 自动生成结构化歌词（Verse-Chorus-Bridge） |
 | ✅ AI 作曲（高级） | 已完成 | 风格描述 + 结构化歌词生成音乐素材 |
-| ✅ 编辑器导出 | **已验证稳定** | 7 步流程导出到「我的资产」（见下方） |
-| 🚧 发布全曲 | 半自动 | 选曲→签约→发布，需用户协助验证码 |
+| ✅ 编辑器导出 | **已验证稳定** | 7 步流程导出到「我的资产」，批量可用 |
+| 👤 发布全曲 | **人工操作** | 选曲→签约→发布，用户在浏览器手动完成 |
 | ✅ 浏览器 Session 持久化 | 已完成 | Chrome 用户数据目录复用登录态 |
 | ✅ 多 Agent 协同 | 已完成 | 双模型异构，子 Agent 用 chat 省成本 |
 
-### 导出状态（当前进度 6/12）
+### 导出状态（11/12 首已导出 ✅）
 
-| 歌曲 | 导出 | 资产页 |
-|------|------|--------|
-| 纸鸢远 | ✅ | 发行全曲 ✅ |
-| 夏蝉语 | ✅ | 发行全曲 ✅ |
-| 迷音 | ✅ | 发行全曲 ✅ |
-| 巷尾琴音 | ✅ | 发行全曲 ✅ |
-| 木吉他叙旧 | ✅ | 发行全曲 ✅ |
-| 吉他与诗 | ✅ | 发行全曲 ✅ |
-| 缓歌寄意 | ❌ 旧版导出 | 歌名错误，无发行按钮 |
-| 杂乱思绪 | ❌ 未导出 | — |
-| 无章 | ❌ 未导出 | — |
-| 无序歌 | ❌ 未导出 | — |
-| 星落肩头 | ❌ 未导出 | — |
-| 空白页 | ❌ 未导出 | — |
+| 歌曲 | 导出 | 资产页 | 发布 |
+|------|------|--------|------|
+| 纸鸢远 | ✅ | ✅ | 👤 人工 |
+| 夏蝉语 | ✅ | ✅ | 👤 人工 |
+| 迷音 | ✅ | ✅ | 👤 人工 |
+| 巷尾琴音 | ✅ | ✅ | 👤 人工 |
+| 木吉他叙旧 | ✅ | ✅ | 👤 人工 |
+| 吉他与诗 | ✅ | ✅ | 👤 人工 |
+| 杂乱思绪 | ✅ | ✅ | 👤 人工 |
+| 无章 | ✅ | ✅ | 👤 人工 |
+| 无序歌 | ✅ | ✅ | 👤 人工 |
+| 星落肩头 | ✅ | ✅ | 👤 人工 |
+| 空白页 | ✅ | ✅ | 👤 人工 |
+| 缓歌寄意 | ❌ 旧版导出 | 歌名错误（显示"欢歌寄意"） | — |
+
+> 👤 = 用户在浏览器手动操作
 
 ---
 
@@ -164,8 +165,11 @@ python main.py --list-tenants
 # 登录（验证码方式）
 python main.py --login --tenant douyin_music_default
 
-# 完整工作流（热搜分析 → 创意 → 词曲 → 发布）
+# 完整工作流（热搜分析 → 创意 → 词曲创作）
 python main.py --full --tenant douyin_music_default
+
+# 单曲导出到资产页
+python export_v5.py "<歌曲名>"
 ```
 
 ---
@@ -244,13 +248,12 @@ def _cleanup(signum, frame):
 │   │   ├── orchestrator.py       # 主控 Agent（V4 Pro）
 │   │   ├── collector_analyst.py  # 热搜分析 Agent
 │   │   ├── creative_director.py  # 创意总监 Agent
-│   │   ├── songwriter.py         # 词曲创作 Agent
-│   │   └── publisher.py          # 发布 Agent
+│   │   └── songwriter.py         # 词曲创作 Agent
+│   │   （publisher.py 已废弃 — 转为人工操作）
 │   ├── collector_service.py      # 热搜采集服务
 │   ├── composition_service.py    # 作曲服务（浏览器操作）
 │   ├── lyrics_service.py         # 歌词生成服务（LLM）
-│   ├── editor_service.py         # 编辑器操作服务
-│   └── publish_service.py        # 发布服务
+│   └── editor_service.py         # 编辑器操作服务
 │
 ├── presentation/                 # 展示层（预留）
 │
@@ -284,7 +287,8 @@ def _cleanup(signum, frame):
 | **CollectorAnalyst** | 分析热搜，识别热门风格 | 市场趋势报告 |
 | **CreativeDirector** | 生成歌曲设计方案 | 歌曲蓝图（JSON） |
 | **Songwriter** | 生成歌词和作曲提示 | 结构化歌词 + 风格描述 |
-| **Publisher** | 发布全曲、管理签约 | 发行结果 |
+
+> ⚠️ PublisherAgent 已移除。发布全曲由用户在浏览器手动操作。
 
 ### 双模型策略
 
