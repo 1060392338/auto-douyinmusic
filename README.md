@@ -34,6 +34,7 @@
 ├── config.yaml                 # 全局配置 + 租户定义
 ├── requirements.txt            # Python依赖
 ├── .env                        # API Key（DeepSeek）
+├── .gitignore
 │
 ├── infrastructure/
 │   ├── browser.py              # BrowserCore — DrissionPage封装
@@ -55,14 +56,20 @@
 │   ├── lyrics_service.py       # 歌词生成（LLM）
 │   └── editor_service.py       # 编辑器操作
 │
-├── export_v5.py                # 🔑 单曲导出脚本（核心工具）
+├── export_v5.py                # 🔑 单曲导出（DrissionPage，生产级）
+├── compose_cdp.py              # 🎵 CDP 直连作曲（灵感/高级模式）
+├── export_cdp.py               # 🧪 CDP 直连导出（WebSocket，试验中）
+├── douyinmusic_opencli.py      # OpenCLI 桥接作曲（备选）
+├── opencli_bridge.py           # OpenCLI 子进程桥接
 ├── check_assets.py             # 资产页验证
 ├── start_chrome.sh             # Chrome启动脚本
 ├── 项目记忆.md                  # 完整踩坑记录
 │
-└── data/
-    └── douyin_music/default/
-        └── chrome_data/        # Chrome用户数据（登录态持久化，不要复制）
+├── archive/                    # 📦 119个废弃版本文件
+├── data/
+│   └── douyin_music/default/
+│       └── chrome_data/        # Chrome用户数据（登录态持久化）
+└── notes/                      # 踩坑笔记
 ```
 
 ---
