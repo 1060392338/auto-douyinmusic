@@ -5,8 +5,9 @@ OrchestratorAgent 统筹整个 AI 音乐创作工作流，
 
 核心设计：
   - 主控 Agent 使用 deepseek-v4-pro 模型（通过 llm 参数传入）
-  - 子 Agent 使用 deepseek-chat 模型（通过 sub_llm 参数传入，更省钱）
-  - 若 sub_llm 未传入，则所有子 Agent 复用主控的 llm
+  - 子 Agent 使用 deepseek-v4-flash 模型（通过 sub_llm 参数传入，更快更省钱）
+  - PublisherAgent 使用 deepseek-v4-pro 模型（通过 pub_llm 参数传入，发布环节需要更强推理）
+  - 若 sub_llm 或 pub_llm 未传入，则自动降级复用已有配置
 """
 
 import traceback
@@ -59,14 +60,17 @@ class OrchestratorAgent(BaseAgent):
         browser: BrowserCore,
         llm: LLMClient,
         sub_llm: Optional[LLMClient] = None,
+        pub_llm: Optional[LLMClient] = None,
     ):
         """初始化 OrchestratorAgent。
 
         Args:
             browser: BrowserCore 实例（需已调用 launch() 启动浏览器）。
             llm: 主控 Agent 用的 LLM 客户端（deepseek-v4-pro）。
-            sub_llm: 子 Agent 用的 LLM 客户端（deepseek-chat），
+            sub_llm: 子 Agent 用的 LLM 客户端（deepseek-v4-flash），
                      不传则全部复用 llm。
+            pub_llm: PublisherAgent 专用 LLM 客户端（deepseek-v4-pro），
+                     不传则复用 sub_llm。
         """
         super().__init__(
             name="Orchestrator",
@@ -75,10 +79,12 @@ class OrchestratorAgent(BaseAgent):
         )
         self.browser = browser
         self.sub_llm = sub_llm or llm
+        self.pub_llm = pub_llm or self.sub_llm
 
         print("[OrchestratorAgent] 🎵 音乐制作人主控 Agent 初始化完成", flush=True)
         print(f"[OrchestratorAgent] 主控模型: {llm.model}", flush=True)
         print(f"[OrchestratorAgent] 子Agent模型: {self.sub_llm.model}", flush=True)
+        print(f"[OrchestratorAgent] Publisher模型: {self.pub_llm.model}", flush=True)
 
     # ── 公开方法 ────────────────────────────────────────────────────────────
 
@@ -358,7 +364,7 @@ class OrchestratorAgent(BaseAgent):
 
             publisher = PublisherAgent(
                 browser=self.browser,
-                llm=self.sub_llm,
+                llm=self.pub_llm,
             )
 
             release_result = publisher.produce_and_release(song_data)

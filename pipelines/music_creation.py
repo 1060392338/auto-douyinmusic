@@ -21,9 +21,10 @@ class MusicCreationPipeline(BasePipeline):
     """音乐创作 Pipeline。
 
     统筹浏览器启动、登录验证和完整创作工作流。
-    使用双模型配置：
+    使用多模型配置：
     - main_llm (deepseek-v4-pro): 主控 OrchestratorAgent
-    - sub_llm (deepseek-chat): 子 Agent（更省钱）
+    - sub_llm (deepseek-v4-flash): 子 Agent（Collector/CreativeDirector/Songwriter）
+    - pub_llm (deepseek-v4-pro): 专用发布 PublisherAgent
     """
 
     def __init__(self, tenant):
@@ -42,12 +43,15 @@ class MusicCreationPipeline(BasePipeline):
         raw_config = load_config()
         llm_cfg = raw_config.get("global", {}).get("llm", {})
         main_cfg = raw_config.get("global", {}).get("llm_main_agent", {})
-        self.llm = LLMClient(**llm_cfg)  # deepseek-chat for sub-agents
+        pub_cfg = raw_config.get("global", {}).get("llm_publisher", llm_cfg)  # 默认复用 llm
+        self.llm = LLMClient(**llm_cfg)  # deepseek-v4-flash for sub-agents
         self.main_llm = LLMClient(**main_cfg)  # deepseek-v4-pro for orchestrator
+        self.pub_llm = LLMClient(**pub_cfg)  # deepseek-v4-pro for publisher
         self.orchestrator = OrchestratorAgent(
             self.browser,
             self.main_llm,
             sub_llm=self.llm,
+            pub_llm=self.pub_llm,
         )
 
     def _ensure_logged_in(self):

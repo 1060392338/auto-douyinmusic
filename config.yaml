@@ -10,6 +10,10 @@ global:
     provider: deepseek
     model: deepseek-v4-pro
     temperature: 0.7
+  llm_publisher:
+    provider: deepseek
+    model: deepseek-v4-pro
+    temperature: 0.3
 
 tenants:
   - id: douyin_music_default
